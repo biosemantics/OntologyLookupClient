@@ -21,8 +21,8 @@ import edu.arizona.sirls.data.Quality;
 import edu.arizona.sirls.data.QualityProposals;
 import edu.arizona.sirls.data.SimpleEntity;
 import edu.arizona.sirls.knowledge.Dictionary;
-import edu.arizona.sirls.search.SynRingVariation;
 
+import edu.arizona.sirls.search.SynRingVariation;
 
 /**
  * @author Hong Cui
@@ -323,6 +323,8 @@ public class Utilities {
 		qentity.setConfidenceScore(q.getConfidenceScore());
 		qentity.setId(q.getId());
 		qentity.setLabel(q.getLabel());
+		qentity.setPLabel(q.getPLabel());
+		qentity.setDef(q.getDef());
 		qentity.setSearchString(q.getSearchString());
 		qentity.setString(q.getString());
 		return qentity;

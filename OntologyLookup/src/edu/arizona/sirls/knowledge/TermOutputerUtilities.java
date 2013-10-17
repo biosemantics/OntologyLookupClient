@@ -17,13 +17,12 @@ import org.apache.log4j.Logger;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntology;
 
+import edu.arizona.sirls.owlaccessor.OWLAccessorImpl;
 
 import org.atteo.evo.inflector.English;
 
-import edu.arizona.sirls.owlaccessor.OWLAccessorImpl;
 import edu.arizona.sirls.search.SearchMain;
 import edu.arizona.sirls.utilities.Utilities;
-
 /**
  * @author Hong Updates
  *
@@ -446,34 +445,50 @@ public class TermOutputerUtilities {
 		ArrayList<String> rids = new ArrayList<String>(Arrays.asList(result.get("id").split(";")));
 		ArrayList<String> rlabels = new ArrayList<String>(Arrays.asList(result.get("label").split(";")));
 		ArrayList<String> riris = new ArrayList<String>(Arrays.asList(result.get("iri").split(";")));
+		ArrayList<String> rplabels = new ArrayList<String>(Arrays.asList(result.get("parentlabel").split(";")));
+		ArrayList<String> rdefs = new ArrayList<String>(Arrays.asList(result.get("def").split(";")));
+		
 		ArrayList<String> tids = new ArrayList<String>(Arrays.asList(temp.get("id").split(";")));
 		ArrayList<String> tlabels = new ArrayList<String>(Arrays.asList(temp.get("label").split(";")));
 		ArrayList<String> tiris = new ArrayList<String>( Arrays.asList(temp.get("iri").split(";")));
+		ArrayList<String> tplabels = new ArrayList<String>(Arrays.asList(temp.get("parentlabel").split(";")));
+		ArrayList<String> tdefs = new ArrayList<String>(Arrays.asList(temp.get("def").split(";")));
+		
 		for(int i = 0; i<rids.size(); i++){
 			if(tids.contains(rids.get(i))){//deduplicate
 				tids.remove(rids.get(i));
 				tlabels.remove(rlabels.get(i));
 				tiris.remove(riris.get(i));
+				tplabels.remove(rplabels.get(i));
+				tdefs.remove(rdefs.get(i));
 			}
 		}
 
 		String ids = ""; 
 		String labels = ""; 
 		String iris = "";
+		String plabels = "";
+		String defs = "";
 		for(int i = 0; i<rids.size(); i++){
 			ids +=rids.get(i)+";";
 			labels +=rlabels.get(i)+";";
 			iris +=riris.get(i)+";";
+			plabels +=rplabels.get(i)+";";
+			defs += rdefs.get(i)+";";
 		}
 		for(int i = 0; i<tids.size(); i++){
 			ids +=tids.get(i)+";";
 			labels +=tlabels.get(i)+";";
 			iris +=tiris.get(i)+";";
+			plabels +=tplabels.get(i)+";";
+			defs += tdefs.get(i)+";";
 		}
 
 		result.put("id", ids.replaceAll("(^;|;$)", ""));
 		result.put("label",labels.replaceAll("(^;|;$)", ""));
 		result.put("iri", iris.replaceAll("(^;|;$)", ""));	
+		result.put("parentlabel",plabels.replaceAll("(^;|;$)", ""));
+		result.put("def",defs.replaceAll("(^;|;$)", ""));
 
 		return result;
 	}
@@ -496,6 +511,8 @@ public class TermOutputerUtilities {
 		result.put("id", "");
 		result.put("label", "");
 		result.put("iri", "");
+		result.put("parentlabel", "");
+		result.put("def", "");
 		boolean haveresult = false;
 		Iterator<OWLClass> it = matches.iterator();
 		while(it.hasNext()){
@@ -503,15 +520,21 @@ public class TermOutputerUtilities {
 			String label = owlapi.getLabel(c);
 			String id = owlapi.getID(c);
 			String iri = c.getIRI().toString();
+			String parentlabel = owlapi.getParentLabel(c);
+			String def = owlapi.getDefinition(c);
 			result.put("id", result.get("id")+ id+";");
 			result.put("label", result.get("label")+ label+";");
 			result.put("iri", result.get("iri")+ iri+";");
+			result.put("parentlabel", result.get("parentlabel")+ parentlabel+";");
+			result.put("def", result.get("def")+ def+";");
 			haveresult = true;
 		}
 		if(haveresult){
 			result.put("id", result.get("id").replaceFirst(";$", ""));
 			result.put("label", result.get("label").replaceFirst(";$", ""));
 			result.put("iri", result.get("iri").replaceFirst(";$", ""));
+			result.put("parentlabel", result.get("parentlabel").replaceFirst(";$", ""));
+			result.put("def", result.get("def").replaceFirst(";$", ""));
 		}
 		if(haveresult) return result;
 		return null;

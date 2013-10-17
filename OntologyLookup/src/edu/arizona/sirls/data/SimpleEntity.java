@@ -17,6 +17,8 @@ public class SimpleEntity extends Entity implements FormalConcept{
 	String id; //id of the class representing the phrase in an ontology
 	String classIRI; //class iri of the class representing the phrase in an ontology
 	float confidenceScore; //the confidence the system has in the id and classIRI represent the semantics of the string.
+	private String parentLabel;
+	private String definition;
 
 	
 	public SimpleEntity(){
@@ -184,5 +186,21 @@ public class SimpleEntity extends Entity implements FormalConcept{
     		return this.getString()+"#";
     	return "";
     }
+
+	public void setPLabel(String string) {
+		this.parentLabel = string;	
+	}
+
+	public void setDef(String string) {
+		this.definition = string;
+	}
+	
+	public String getPLabel() {
+		return this.parentLabel;	
+	}
+
+	public String getDef() {
+		return this.definition;
+	}
     
 }

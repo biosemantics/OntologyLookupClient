@@ -41,7 +41,6 @@ import edu.arizona.sirls.owlaccessor.OWLAccessorImpl;
 import edu.arizona.sirls.search.SearchMain;
 
 
-
 public class ELKReasoner{
 	private static final Logger LOGGER = Logger.getLogger("org.semanticweb.elk");   
 	private OWLReasoner reasoner;

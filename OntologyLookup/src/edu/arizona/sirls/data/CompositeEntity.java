@@ -7,7 +7,6 @@ import java.util.ArrayList;
 
 import edu.arizona.sirls.knowledge.Dictionary;
 
-
 /**
  * @author Hong Cui
  *
@@ -424,6 +423,30 @@ public class CompositeEntity extends Entity {
 		
 		string = string.replaceAll("(#)$", "");
 		return string.trim();	
+	}
+
+	@Override
+	public void setPLabel(String parentlabel) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setDef(String definition) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getPLabel() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getDef() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import org.apache.log4j.Logger;
 
+import edu.arizona.sirls.utilities.Utilities;
 import edu.arizona.sirls.data.EntityProposals;
 import edu.arizona.sirls.knowledge.Dictionary;
-import edu.arizona.sirls.utilities.Utilities;
 
 /**
  * @author hong cui

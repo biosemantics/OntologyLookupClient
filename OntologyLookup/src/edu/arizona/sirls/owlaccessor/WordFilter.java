@@ -6,7 +6,6 @@ import java.util.StringTokenizer;
 
 import edu.arizona.sirls.knowledge.Dictionary;
 
-
 public class WordFilter {
 	private Set<String> wl;
 	

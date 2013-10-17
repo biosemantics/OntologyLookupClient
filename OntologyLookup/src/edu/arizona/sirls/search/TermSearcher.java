@@ -14,12 +14,12 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
+import edu.arizona.sirls.utilities.Utilities;
 import edu.arizona.sirls.data.FormalConcept;
 import edu.arizona.sirls.data.Quality;
 import edu.arizona.sirls.data.SimpleEntity;
 import edu.arizona.sirls.knowledge.Dictionary;
 import edu.arizona.sirls.knowledge.Wordforms;
-import edu.arizona.sirls.utilities.Utilities;
 
 /**
  * @author hong cui accepts entity (entity, entity locator, quality modifier)
@@ -283,6 +283,8 @@ public class TermSearcher {
 						entity.setLabel(result.get("label"));
 						entity.setId(result.get("id"));
 						entity.setClassIRI(result.get("iri"));
+						entity.setPLabel(result.get("parentlabel"));
+						entity.setDef(result.get("def"));
 						entity.setConfidenceScore(confscore);
 						// cacheIt(aresult.get("term"), entity, type);
 						// return entity;
@@ -296,6 +298,8 @@ public class TermSearcher {
 						quality.setLabel(result.get("label").split(";")[0]);
 						quality.setId(result.get("id").split(";")[0]);
 						quality.setClassIRI(result.get("iri").split(";")[0]);
+						quality.setPLabel(result.get("parentlabel").split(";")[0]);
+						quality.setDef(result.get("def").split(";")[0]);
 						quality.setConfidenceScore(confscore);
 						// cacheIt(aresult.get("term"), quality, type);
 						// return quality;
@@ -391,6 +395,8 @@ public class TermSearcher {
 							entity.setLabel(result.get("label"));
 							entity.setId(result.get("id"));
 							entity.setClassIRI(result.get("iri"));
+							entity.setPLabel(result.get("parentlabel"));
+							entity.setDef(result.get("def"));
 							entity.setConfidenceScore(confscore);
 							// cacheIt(term, entity, type);
 							if (concepts == null)
@@ -404,6 +410,8 @@ public class TermSearcher {
 							quality.setLabel(result.get("label"));
 							quality.setId(result.get("id"));
 							quality.setClassIRI(result.get("iri"));
+							quality.setPLabel(result.get("parentlabel"));
+							quality.setDef(result.get("def"));
 							quality.setConfidenceScore(confscore);
 							// cacheIt(term, quality, type);
 							if (concepts == null)

@@ -9,6 +9,8 @@ public class Quality implements FormalConcept {
 	protected String classIRI; //class iri of the class representing the phrase in an ontology
 	protected String type; //quality or negated quality
 	protected float confidenceScore; //the confidence the system has in the id and classIRI represent the semantics of the string.
+	private String definition;
+	private String parentLabel;
 	
 	public Quality() {
 		// TODO Auto-generated constructor stub
@@ -195,6 +197,23 @@ public class Quality implements FormalConcept {
 	public String getString() {
 		return this.string;
 	}
+
+	public void setPLabel(String string) {
+		this.parentLabel = string;	
+	}
+
+	public void setDef(String string) {
+		this.definition = string;
+	}
+	
+	public String getPLabel() {
+		return this.parentLabel;	
+	}
+
+	public String getDef() {
+		return this.definition;
+	}
+    
 }
 
 

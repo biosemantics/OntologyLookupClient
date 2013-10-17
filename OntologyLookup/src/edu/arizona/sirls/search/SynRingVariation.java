@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import org.apache.log4j.Logger;
-
 import edu.arizona.sirls.knowledge.Dictionary;
 import edu.arizona.sirls.knowledge.TermOutputerUtilities;
 import edu.arizona.sirls.owlaccessor.OWLAccessorImpl;

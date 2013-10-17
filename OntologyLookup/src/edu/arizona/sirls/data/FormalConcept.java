@@ -14,6 +14,8 @@ public interface FormalConcept {
 	void setLabel(String label);
 	void setId(String id);
 	void setClassIRI(String IRI);
+	void setPLabel(String parentlabel);
+	void setDef(String definition);
 	void setConfidenceScore(float score);//may also record difficulty level
 	String getSearchString();
 	String getString();
@@ -21,6 +23,8 @@ public interface FormalConcept {
 	String getLabel();
 	String getId();
 	String getClassIRI();
+	String getPLabel();
+	String getDef();
 	float getConfidenceScore();
 	String toString(); //for display
 	String content(); //for comparison, including identifying info such as classIRI

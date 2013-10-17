@@ -95,7 +95,7 @@ public class Dictionary {
 	static{
 		headnounsyns.put("region", "portion|end|segment|area|component|part");
 	}
-	public static Hashtable<String,Hashtable<String, String>> relationalqualities = new Hashtable<String,Hashtable<String, String>>();
+	
 	public static Hashtable<String,Hashtable<String, String>> restrictedrelations = new Hashtable<String,Hashtable<String, String>>();
 
 	public static Hashtable<String, String> resrelationQ = new Hashtable<String, String>();
@@ -189,7 +189,7 @@ public class Dictionary {
 	public static Hashtable<String, String> singulars = new Hashtable<String, String>();
 	public static Hashtable<String, String> plurals = new Hashtable<String, String>();
 	//private ArrayList<Hashtable<String, String>>  alladjectiveorgans = new ArrayList<Hashtable<String, String>> (); //one hashtable from an ontology
-	public static IDictionary wordnetdict = new edu.mit.jwi.Dictionary(new File(System.getProperty("user.dir"), "dict"));
+	public static IDictionary wordnetdict = new edu.mit.jwi.Dictionary(new File(SearchMain.dictdir));
 	
 	//to hold complement of relations
 	public static Hashtable<String,String> complementRelations = new Hashtable<String,String>();
@@ -548,29 +548,7 @@ public class Dictionary {
 			translateToPATO.put("BFO:0000052","PATO:inheres_in");
 			translateToPATO.put("PHENOSCAPE:complement_of","PATO:0000001");	
 	}
-	//syn phrases mapping to relational qualities
-	static{
-		//THis code populates the relationalqualities from Pato - Hariharan	
-		//relations in resrelationQ take a higher priority than the relations from the relationalslim for equivalent relations.
-		File pato_file = new File(SearchMain.pato);
-		//String url = "http://obo.svn.sourceforge.net/viewvc/obo/uberon/trunk/merged.owl";
-		OWLAccessorImpl a = new OWLAccessorImpl(pato_file, new ArrayList<String>());		
-		for(OWLClass b:a.getRelationalSlim())
-			{
-			String root_form = edu.arizona.sirls.utilities.Utilities.removeprepositions(a.getLabel(b).trim());
-			if(relationalqualities.containsKey(root_form))
-			{
-				Hashtable<String,String> list = relationalqualities.get(root_form);
-				list.put(a.getLabel(b).trim(), a.getID(b).trim());
-			}
-			else
-			{
-				Hashtable<String,String> list = new Hashtable<String,String>();
-				list.put(a.getLabel(b).trim(), a.getID(b).trim());
-				relationalqualities.put(root_form,list);
-			}
-			}
-	}
+	
 	//wordnet 
 	static{
 		try {

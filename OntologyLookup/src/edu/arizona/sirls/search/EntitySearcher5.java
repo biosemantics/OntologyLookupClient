@@ -6,10 +6,10 @@ import java.util.Hashtable;
 import org.apache.log4j.Logger;
 
 
+import edu.arizona.sirls.utilities.Utilities;
 import edu.arizona.sirls.data.EntityProposals;
 import edu.arizona.sirls.data.FormalConcept;
 import edu.arizona.sirls.data.SimpleEntity;
-import edu.arizona.sirls.utilities.Utilities;
 
 /**
  * 
@@ -57,7 +57,10 @@ public class EntitySearcher5 extends EntitySearcher {
 				LOGGER.debug("...search entity '"+aentityphrase+" .*' found match");
 				for(FormalConcept regexpresult: regexpresults){
 					//regexpresult.setSearchString(originalentityphrase+"["+regexpresult.getSearchString()+"]"); //record originalentityphrase for grouping entity proposals later
-					headnouns.put(regexpresult.getLabel().replace(aentityphrase, ""), regexpresult.getId()+"#"+regexpresult.getClassIRI()); //don't trim headnoun
+					headnouns.put(regexpresult.getLabel().replace(aentityphrase, ""), regexpresult.getId()+"#"
+					+regexpresult.getClassIRI()+"#"
+							+regexpresult.getPLabel()+"#"
+							+regexpresult.getDef()); //don't trim headnoun
 				}	
 				
 				if(regexpresults.size()<10){
@@ -87,6 +90,8 @@ public class EntitySearcher5 extends EntitySearcher {
 					sentity.setId(idiri[0]);
 					sentity.setConfidenceScore(score);
 					sentity.setClassIRI(idiri[1]);
+					sentity.setPLabel(idiri[2]);
+					sentity.setDef(idiri[3]);
 					ep.add(sentity);
 					LOGGER.debug(".....add a proposal:"+sentity);
 					found = true;
@@ -157,9 +162,7 @@ public class EntitySearcher5 extends EntitySearcher {
 				String noun = keys.nextElement();
 				if(noun.indexOf(" of ")>=0 || noun.indexOf(" and ")>=0) continue; //coronoids 'proccess of ulna': coronoids can't possibility be used to represent a complex concept that require the use of "of"
 				if(noun.trim().indexOf(" ")<= 0){
-					
 						result += noun+","; //don't trim noun
-					
 				}
 			}
 			if(result.trim().length()>0){

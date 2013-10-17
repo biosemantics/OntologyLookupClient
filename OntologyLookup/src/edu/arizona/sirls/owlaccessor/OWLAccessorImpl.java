@@ -26,7 +26,6 @@ import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 import edu.arizona.sirls.knowledge.Dictionary;
 import edu.arizona.sirls.search.TermSearcher;
 
-
 // TODO: Auto-generated Javadoc
 //import org.semanticweb.owlapi.util.SimpleIRIMapper;
 
@@ -105,6 +104,7 @@ public class OWLAccessorImpl implements OWLAccessor {
 			this.retrieveAllConcept();
 		}catch(Exception e){
 			System.out.println("can't load ontology:"+ontoURL);
+			e.printStackTrace();
 			System.exit(1);
 		}
 	}
@@ -1011,6 +1011,39 @@ public class OWLAccessorImpl implements OWLAccessor {
 			return this.getRefinedOutput(((OWLAnnotation) ids.toArray()[0])
 					.toString());
 		}*/
+	}
+	
+	public String getDefinition(OWLClass c){
+		String definition = "";
+		Set<OWLAnnotation> anns = this.getAnnotationByIRI(c,
+				"http://purl.obolibrary.org/obo/IAO_0000115"); //definition
+		ArrayList<String> labels = new ArrayList<String>();
+		Iterator<OWLAnnotation> it = anns.iterator();
+		while (it.hasNext()) {
+			String def = it.next().toString();
+			//Annotation(<http://purl.obolibrary.org/obo/IAO_0000115> "A condyle that is part of a distal epiphysis of femur."^^xsd:string)
+			definition += def.substring(def.indexOf("\"")+1, def.lastIndexOf("\"")) +" ";
+		}
+		return definition.replaceAll("\\s+", " ").trim();
+	}
+	
+	/**
+	 * 
+	 * @param c
+	 * @return ;-separated string
+	 */
+	public String getParentLabel(OWLClass c){
+		String r = "";
+		if(c!=null){
+			Set<OWLClassExpression> supclasses = c.getSuperClasses(onts);
+			for (OWLClassExpression ch : supclasses) {
+				if(!ch.isAnonymous()){
+					OWLClass o = ch.asOWLClass();
+					r += getLabel(o) +";";
+				}
+			}
+		}
+		return r.replaceFirst(";$", "").trim();
 	}
 	
 	/**

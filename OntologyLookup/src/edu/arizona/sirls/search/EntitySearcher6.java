@@ -8,6 +8,7 @@ import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 
+import edu.arizona.sirls.utilities.Utilities;
 import edu.arizona.sirls.data.CompositeEntity;
 import edu.arizona.sirls.data.EntityProposals;
 import edu.arizona.sirls.data.FormalConcept;
@@ -15,7 +16,6 @@ import edu.arizona.sirls.data.FormalRelation;
 import edu.arizona.sirls.data.REntity;
 import edu.arizona.sirls.data.SimpleEntity;
 import edu.arizona.sirls.knowledge.Dictionary;
-import edu.arizona.sirls.utilities.Utilities;
 
 /**
  * @author Hong Cui

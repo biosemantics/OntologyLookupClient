@@ -208,5 +208,29 @@ public class REntity extends Entity{
     	
     }
 
+	@Override
+	public void setPLabel(String parentlabel) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setDef(String definition) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getPLabel() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getDef() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }
