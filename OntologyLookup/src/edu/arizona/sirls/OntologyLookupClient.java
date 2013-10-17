@@ -60,13 +60,7 @@ public class OntologyLookupClient {
 
 	public ArrayList<FormalConcept> searchCharacter(String term) {
 		TermSearcher ts = new TermSearcher();
-		ArrayList<FormalConcept> fcs = ts.searchTerm(term, "quality");
-		if (fcs != null) {
-			for (FormalConcept fc : fcs)
-				System.out.println(term + ": " + fc.getLabel()
-						+ fc.getClassIRI());
-		}
-		return fcs;
+		return ts.searchTerm(term, "quality");
 	}
 
 	public ArrayList<EntityProposals> searchStrucutre(String term) {
@@ -86,7 +80,44 @@ public class OntologyLookupClient {
 	public static void main(String[] args) {
 		OntologyLookupClient client = new OntologyLookupClient("po",
 				"D:\\Work\\Code\\OTOLiteForETC\\OntologyOwlFiles");
-		client.searchCharacter("red");
-		client.searchStrucutre("leaf");
+
+		String term = "red";
+		ArrayList<FormalConcept> fcs = client.searchCharacter(term);
+		if (fcs != null) {
+			for (FormalConcept fc : fcs) {
+				System.out.println(term + ": ");
+				System.out.println("\tClassIRI: " + fc.getClassIRI());
+				System.out.println("\tId: " + fc.getId());
+				System.out.println("\tLabel: " + fc.getLabel());
+				System.out.println("\tSearchString: " + fc.getSearchString());
+				System.out.println("\tString: " + fc.getString());
+			}
+
+		}
+
+		term = "leaf";
+		ArrayList<EntityProposals> eps = client.searchStrucutre("leaf");
+		if (eps != null) {
+			for (EntityProposals ep : eps) {
+				for (Entity e : ep.getProposals()) {
+					System.out.println(term + ": ");
+					System.out.println("\tClassIRI: " + e.getClassIRI());
+					System.out.println("\tId: " + e.getId());
+					System.out.println("\tLabel: " + e.getLabel());
+					System.out
+							.println("\tSearchString: " + e.getSearchString());
+					System.out.println("\tString: " + e.getString());
+
+					System.out.println("\tPrimaryEntityID: "
+							+ e.getPrimaryEntityID());
+					System.out.println("\tPrimaryEntityLabel: "
+							+ e.getPrimaryEntityLabel());
+					System.out.println("\tPrimaryEntityOWLClassIRI: "
+							+ e.getPrimaryEntityOWLClassIRI());
+					System.out.println("\tPrimaryString: "
+							+ e.getPrimaryEntityString());
+				}
+			}
+		}
 	}
 }
