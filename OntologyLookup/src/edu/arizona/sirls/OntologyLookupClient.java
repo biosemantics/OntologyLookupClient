@@ -65,16 +65,7 @@ public class OntologyLookupClient {
 
 	public ArrayList<EntityProposals> searchStrucutre(String term) {
 		EntitySearcherOriginal eso = new EntitySearcherOriginal();
-		ArrayList<EntityProposals> eps = eso.searchEntity(term, "", term + "+"
-				+ "", rel);
-		if (eps != null) {
-			for (EntityProposals ep : eps)
-				for (Entity e : ep.getProposals()) {
-					System.out.println(term + ": " + e.getLabel() + ":"
-							+ e.getClassIRI());
-				}
-		}
-		return eps;
+		return eso.searchEntity(term, "", term + "+" + "", rel);
 	}
 
 	public static void main(String[] args) {
