@@ -442,6 +442,8 @@ public class TermSearcher {
 		String[] labels = multiplevalues.get("label").split(";");
 		String[] ids = multiplevalues.get("id").split(";");
 		String[] iris = multiplevalues.get("iri").split(";");
+		String[] defs = multiplevalues.get("def").split(";");
+		String[] plabels = multiplevalues.get("parentlabel").split(";");
 
 		if (labels.length == 1) {
 			splited.add(multiplevalues);
@@ -452,6 +454,8 @@ public class TermSearcher {
 				one.put("label", labels[i]);
 				one.put("id", ids[i]);
 				one.put("iri", iris[i]);
+				one.put("def", defs[i]);
+				one.put("parentlabel", plabels[i]);
 				splited.add(one);
 			}
 		}

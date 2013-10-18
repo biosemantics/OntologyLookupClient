@@ -55,10 +55,10 @@ public class OntologyLookupClient {
 
 	public static void main(String[] args) {
 		OntologyLookupClient client = new OntologyLookupClient("ext",
-				"/home/sbs0457/workspace/OTOLiteForETC/OntologyOwlFiles",
-				"/home/sbs0457/workspace/OTOLiteForETC/DictFiles");
+				"C:/Users/updates/CharaParserTest/Ontologies",
+				"C:/Users/updates/CharaParserTest/Ontologies/dict");
 
-		String term = "red";
+		String term = "round";
 		ArrayList<FormalConcept> fcs = client.searchCharacter(term);
 		if (fcs != null) {
 			for (FormalConcept fc : fcs) {
