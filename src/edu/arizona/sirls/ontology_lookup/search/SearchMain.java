@@ -49,23 +49,23 @@ public class SearchMain {
 		// result: femur condyle:condyle of
 		// femur:http://purl.obolibrary.org/obo/UBERON_0009980
 
-		String type = args[0]; // search type: quality or entity (i.e.,
-								// structure)
-		String ontologydir = args[1]; //
-		String eonto = args[2];
-		String bspo = args[3];
-		String pato = args[4];
-		String term = args[5];
-		SearchMain.dictdir = args[6];
+//		String type = args[0]; // search type: quality or entity (i.e.,
+//								// structure)
+//		String ontologydir = args[1]; //
+//		String eonto = args[2];
+//		String bspo = args[3];
+//		String pato = args[4];
+//		String term = args[5];
+//		SearchMain.dictdir = args[6];
 		String rel = "part_of";
 
-//		String type = "entity"; // search type: quality or entity (i.e., structure)
-//		String ontologydir = "D:\\Work\\Code\\OTOLiteForETC\\OntologyOwlFiles"; //
-//		String eonto = "ext";
-//		String bspo = "bspo";
-//		String pato = "pato";
-//		String term = "condyle of femur";
-//		SearchMain.dictdir = "D:\\Work\\Code\\OTOLiteForETC\\DictFiles";
+		String type = "quality"; // search type: quality or entity (i.e., structure)
+		String ontologydir = "/home/sbs0457/workspace/OTOLiteForETC/OntologyOwlFiles"; //
+		String eonto = "ext";
+		String bspo = "bspo";
+		String pato = "pato";
+		String term = "round";
+		SearchMain.dictdir = "/home/sbs0457/workspace/OTOLiteForETC/DictFiles";
 
 		// get ontology filepaths and urls
 

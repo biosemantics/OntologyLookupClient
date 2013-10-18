@@ -55,8 +55,8 @@ public class OntologyLookupClient {
 
 	public static void main(String[] args) {
 		OntologyLookupClient client = new OntologyLookupClient("ext",
-				"D:\\Work\\Code\\OTOLiteForETC\\OntologyOwlFiles",
-				"D:\\Work\\Code\\OTOLiteForETC\\DictFiles");
+				"/home/sbs0457/workspace/OTOLiteForETC/OntologyOwlFiles",
+				"/home/sbs0457/workspace/OTOLiteForETC/DictFiles");
 
 		String term = "red";
 		ArrayList<FormalConcept> fcs = client.searchCharacter(term);
