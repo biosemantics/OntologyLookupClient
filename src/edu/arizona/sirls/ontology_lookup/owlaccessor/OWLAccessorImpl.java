@@ -749,8 +749,8 @@ public class OWLAccessorImpl implements OWLAccessor {
 			superCls.accept(restrictionVisitor);
 		}
 		}
-		System.out.println("Classes In Restricted properties for " + part + ": "
-				+ restrictionVisitor.getClassInRestrictedProperties().size());
+		//System.out.println("Classes In Restricted properties for " + part + ": "
+		//		+ restrictionVisitor.getClassInRestrictedProperties().size());
 		/*for (OWLObjectPropertyExpression prop : restrictionVisitor
 				.getRestrictedProperties()) {
 			if(prop instanceof OWLObjectSomeValuesFrom){

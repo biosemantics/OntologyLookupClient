@@ -75,6 +75,17 @@ public class SearchPartOfChain {
 			System.out.println(e.getDef());
 		}
 		
+		/*parent organ in order: 
+corolla
+http://purl.obolibrary.org/obo/PO_0009059
+A collective phyllome structure (PO:0025023) that is composed of one or more petals (PO:0009032), comprising the inner whorl of non-reproductive floral organs (PO:0025395) and surrounds the androecium (PO:0009061) and the gynoecium (PO:0009062).
+perianth
+http://purl.obolibrary.org/obo/PO_0009058
+A collective phyllome structure (PO:0025023) that includes as parts the corolla (PO:0009059) and/or the calyx (PO:0009060); or one or more tepals (PO:0009033).
+flower
+http://purl.obolibrary.org/obo/PO_0009046
+A determinate reproductive shoot system that has as part at least one carpel or at least one stamen and does not contain any other determinate shoot system as a part.
+*/
 	}
 
 }
