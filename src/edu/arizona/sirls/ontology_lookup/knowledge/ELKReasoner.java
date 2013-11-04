@@ -26,6 +26,7 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -292,13 +293,20 @@ public class ELKReasoner{
 			OWLClassExpression superCls = ax.getSuperClass();
 			superCls.accept(restrictionVisitor);
 		}
-		System.out.println("Restricted properties for " + part + ": "
-				+ restrictionVisitor.getRestrictedProperties().size());
-		for (OWLObjectSomeValuesFrom prop : restrictionVisitor
+		System.out.println("Classes In Restricted properties for " + part + ": "
+				+ restrictionVisitor.getClassInRestrictedProperties().size());
+		/*for (OWLObjectPropertyExpression prop : restrictionVisitor
 				.getRestrictedProperties()) {
-			if(prop.getProperty().toString().contains("http://purl.obolibrary.org/obo/BFO_0000050")){
-				classeswithpart.add((OWLClass) prop.getFiller());
+			if(prop instanceof OWLObjectSomeValuesFrom){
+			if(((OWLObjectSomeValuesFrom)prop).getProperty().toString().contains("http://purl.obolibrary.org/obo/BFO_0000050")){
+				classeswithpart.add((OWLClass) ((OWLObjectSomeValuesFrom)prop).getFiller());
+			}else{
+				System.out.println(prop);
 			}
+			}
+		}*/
+		for(OWLClassExpression ce: restrictionVisitor.getClassInRestrictedProperties()){
+			if(ce instanceof OWLClass) classeswithpart.add((OWLClass)ce);
 		}
 
 		//loop though classeswithpart
@@ -354,9 +362,71 @@ public class ELKReasoner{
 	
 	public OWLOntology getOntology(){return ont;}
 
+	
+
+    /**
+     * Visits existential restrictions and collects the properties which are restricted
+     */
+    private static class RestrictionVisitor extends OWLClassExpressionVisitorAdapter {
+
+        private boolean processInherited = false;
+
+        private Set<OWLClass> processedClasses;
+
+        private Set<OWLClassExpression> classInRestrictedProperties;
+
+        private Set<OWLOntology> onts;
+
+        public RestrictionVisitor(Set<OWLOntology> onts) {
+            classInRestrictedProperties = new HashSet<OWLClassExpression>();
+            processedClasses = new HashSet<OWLClass>();
+            this.onts = onts;
+        }
+
+
+        public void setProcessInherited(boolean processInherited) {
+            this.processInherited = processInherited;
+        }
+
+
+        public Set<OWLClassExpression> getClassInRestrictedProperties() {
+            return classInRestrictedProperties;
+        }
+
+
+        public void visit(OWLClass desc) {
+            if (processInherited && !processedClasses.contains(desc)) {
+                // If we are processing inherited restrictions then
+                // we recursively visit named supers.  Note that we
+                // need to keep track of the classes that we have processed
+                // so that we don't get caught out by cycles in the taxonomy
+                processedClasses.add(desc);
+                for (OWLOntology ont : onts) {
+                    for (OWLSubClassOfAxiom ax : ont.getSubClassAxiomsForSubClass(desc)) {
+                        ax.getSuperClass().accept(this);
+                    }
+                }
+            }
+        }
+
+
+        public void reset() {
+            processedClasses.clear();
+            classInRestrictedProperties.clear();
+        }
+
+
+        public void visit(OWLObjectSomeValuesFrom desc) {
+            // This method gets called when a class expression is an
+            // existential (someValuesFrom) restriction and it asks us to visit it
+            //classInRestrictedProperties.add(desc.getProperty());
+        	if(desc.getProperty().toString().contains("http://purl.obolibrary.org/obo/BFO_0000050"))
+        		classInRestrictedProperties.add(desc.getFiller());
+        }
+    }
 	/** Visits existential restrictions and collects the properties which are
 	 * restricted */
-	private static class RestrictionVisitor extends OWLClassExpressionVisitorAdapter {
+	/*private static class RestrictionVisitor extends OWLClassExpressionVisitorAdapter {
 		private Set<OWLClass> processedClasses;
 		private Set<OWLObjectSomeValuesFrom> restrictedProperties;
 		private Set<OWLOntology> onts;
@@ -390,7 +460,26 @@ public class ELKReasoner{
 				}
 			}
 		}
-	}
+		
+		public void visit(OWLClassExpression desc) {
+			if (!processedClasses.contains(desc)) {
+				// If we are processing inherited restrictions then we
+				// recursively visit named supers. Note that we need to keep
+				// track of the classes that we have processed so that we don't
+				// get caught out by cycles in the taxonomy
+				processedClasses.add(desc);
+				for (OWLOntology ont : onts) {
+					for (OWLSubClassOfAxiom ax : ont.getSubClassAxiomsForSubClass(desc)) {
+						OWLClassExpression superCls = ax.getSuperClass();
+						if(superCls instanceof OWLObjectSomeValuesFrom){
+							restrictedProperties.add((OWLObjectSomeValuesFrom)superCls);
+						}
+						superCls.accept(this);
+					}
+				}
+			}
+		}
+	}*/
 
 	public Boolean CheckClassExistence(String id)
 	{
@@ -411,10 +500,21 @@ public class ELKReasoner{
 	
 	public static void main(String[] argv){
 		try {
-			ELKReasoner elk = new ELKReasoner(new File(SearchMain.eonto), true);
-			System.out.println("..........class Exists......."+elk.CheckClassExistence("UBERON:4200047"));
-			System.out.println("..........class Exists......."+elk.CheckClassExistence("TEMP:4200047"));
-			System.out.println("..........class Exists......."+elk.CheckClassExistence("UBERON:0011584"));
+			ELKReasoner elk = new ELKReasoner(new File("C:\\Users\\updates\\CharaParserTest\\Ontologies\\po.owl"), true);
+			String whole ="http://purl.obolibrary.org/obo/PO_0025395";//floral organ
+			String part = "http://purl.obolibrary.org/obo/PO_0009032"; //petal
+			System.out.println(elk.isSubclassOfWithPart(whole, part)); 
+			//processInherited=true
+			//whole:[<http://purl.obolibrary.org/obo/PO_0009059>, //corolla
+			//<http://purl.obolibrary.org/obo/PO_0009006>,//shoot system
+			//<http://purl.obolibrary.org/obo/PO_0009046>, //flower
+			//processInherited=false
+			//whole:[<http://purl.obolibrary.org/obo/PO_0009059>, //corolla
+			
+			//ELKReasoner elk = new ELKReasoner(new File(SearchMain.eonto), true);
+			//System.out.println("..........class Exists......."+elk.CheckClassExistence("UBERON:4200047"));
+			//System.out.println("..........class Exists......."+elk.CheckClassExistence("TEMP:4200047"));
+			//System.out.println("..........class Exists......."+elk.CheckClassExistence("UBERON:0011584"));
 
 
 			//elk.getClassesWithLateralSides();

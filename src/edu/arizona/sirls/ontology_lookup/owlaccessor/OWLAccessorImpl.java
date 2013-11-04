@@ -8,6 +8,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -17,10 +18,12 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 //import org.semanticweb.owlapi.io.*;
 import org.semanticweb.owlapi.model.*;
+import org.semanticweb.owlapi.util.OWLClassExpressionVisitorAdapter;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
 import edu.arizona.sirls.ontology_lookup.knowledge.Dictionary;
@@ -83,7 +86,8 @@ public class OWLAccessorImpl implements OWLAccessor {
 	private String source;
 	private OWLOntology rootOnt;
 
-	private Hashtable<String, Hashtable<String, ArrayList<OWLClass>>> searchCache = new Hashtable<String, Hashtable<String, ArrayList<OWLClass>>>(); //con => {syn type => classes}
+	private static Hashtable<String, Hashtable<String, ArrayList<OWLClass>>> searchCache = new Hashtable<String, Hashtable<String, ArrayList<OWLClass>>>(); //con => {syn type => classes}
+	private static Hashtable<String, Set<OWLClass>> classesWithPartCache = new Hashtable<String, Set<OWLClass>> ();
 	public final static String temp = "TEMP";
 	/**
 	 * Instantiates a new oWL accessor impl.
@@ -644,7 +648,7 @@ public class OWLAccessorImpl implements OWLAccessor {
 	// }
 
 	/**
-	 * Return the parents of a term.
+	 * Return the supper class of a term.
 	 */
 	public List<OWLClass> getParents(OWLClass c) {
 		List<OWLClass> parent = new ArrayList<OWLClass>();
@@ -657,6 +661,7 @@ public class OWLAccessorImpl implements OWLAccessor {
 		return parent;
 	}
 
+	
 	/**
 	 * Gets the annotation property by an iri string.
 	 * 
@@ -722,23 +727,108 @@ public class OWLAccessorImpl implements OWLAccessor {
 	}
 	
 	/**
-	 * 		is class a subclass of the things that has part part
-		for example, could 'caudal fin' has_part 'epichordal lepidotrichium'?
-	 * @param classIRI
+	 * this method was largely taken from examples published on OWL API website.
+	 * but it does not gather all the restrictions ('inherited anonymous classes').
+	 * 
+	 * is subclassIRI a subclass of something with part partIRI, in other words, 
+	 * can this subclassIRI has part partIRI? 
+	 * @param subclassIRI
 	 * @param partIRI
 	 * @return
 	 */
-	public boolean isSubclassOfWithPart(String classIRI, String partIRI){	
-		
-		OWLClass part= df.getOWLClass(IRI.create(partIRI)); //'epichordal lepidotrichium'
-		OWLClass claz= df.getOWLClass(IRI.create(classIRI)); //'caudal fin' 4000164
-		//find all classes that have 'part' 
-		Set<OWLAnnotationAssertionAxiom> properties = part.getAnnotationAssertionAxioms(this.rootOnt);
-		for(OWLAnnotationAssertionAxiom p: properties){
-			p.toString();
+	public Set<OWLClass> getClassesWithPart(String partIRI){	
+		//cache
+		if(this.classesWithPartCache.get(partIRI)!=null) return this.classesWithPartCache.get(partIRI);
+		OWLClass part= df.getOWLClass(IRI.create(partIRI)); 
+		HashSet<OWLClass> classeswithpart = new HashSet<OWLClass>();
+		RestrictionVisitor restrictionVisitor = new RestrictionVisitor(this.onts);
+		for(OWLOntology ont: onts){
+		for (OWLSubClassOfAxiom ax : ont
+				.getSubClassAxiomsForSubClass(part)) {
+			OWLClassExpression superCls = ax.getSuperClass();
+			superCls.accept(restrictionVisitor);
 		}
-		return false;
+		}
+		System.out.println("Classes In Restricted properties for " + part + ": "
+				+ restrictionVisitor.getClassInRestrictedProperties().size());
+		/*for (OWLObjectPropertyExpression prop : restrictionVisitor
+				.getRestrictedProperties()) {
+			if(prop instanceof OWLObjectSomeValuesFrom){
+			if(((OWLObjectSomeValuesFrom)prop).getProperty().toString().contains("http://purl.obolibrary.org/obo/BFO_0000050")){
+				classeswithpart.add((OWLClass) ((OWLObjectSomeValuesFrom)prop).getFiller());
+			}else{
+				System.out.println(prop);
+			}
+			}
+		}*/
+		for(OWLClassExpression ce: restrictionVisitor.getClassInRestrictedProperties()){
+			if(ce instanceof OWLClass) classeswithpart.add((OWLClass)ce);
+		}
+		//caching
+		this.classesWithPartCache.put(partIRI, classeswithpart);
+		return classeswithpart;
 	}
+
+	/**
+     * Visits existential restrictions and collects the properties which are restricted
+     */
+    private static class RestrictionVisitor extends OWLClassExpressionVisitorAdapter {
+
+        private boolean processInherited = false;
+
+        private Set<OWLClass> processedClasses;
+
+        private Set<OWLClassExpression> classInRestrictedProperties;
+
+        private Set<OWLOntology> onts;
+
+        public RestrictionVisitor(Set<OWLOntology> onts) {
+            classInRestrictedProperties = new HashSet<OWLClassExpression>();
+            processedClasses = new HashSet<OWLClass>();
+            this.onts = onts;
+        }
+
+
+        public void setProcessInherited(boolean processInherited) {
+            this.processInherited = processInherited;
+        }
+
+
+        public Set<OWLClassExpression> getClassInRestrictedProperties() {
+            return classInRestrictedProperties;
+        }
+
+
+        public void visit(OWLClass desc) {
+            if (processInherited && !processedClasses.contains(desc)) {
+                // If we are processing inherited restrictions then
+                // we recursively visit named supers.  Note that we
+                // need to keep track of the classes that we have processed
+                // so that we don't get caught out by cycles in the taxonomy
+                processedClasses.add(desc);
+                for (OWLOntology ont : onts) {
+                    for (OWLSubClassOfAxiom ax : ont.getSubClassAxiomsForSubClass(desc)) {
+                        ax.getSuperClass().accept(this);
+                    }
+                }
+            }
+        }
+
+
+        public void reset() {
+            processedClasses.clear();
+            classInRestrictedProperties.clear();
+        }
+
+
+        public void visit(OWLObjectSomeValuesFrom desc) {
+            // This method gets called when a class expression is an
+            // existential (someValuesFrom) restriction and it asks us to visit it
+            //classInRestrictedProperties.add(desc.getProperty());
+        	if(desc.getProperty().toString().contains("http://purl.obolibrary.org/obo/BFO_0000050"))
+        		classInRestrictedProperties.add(desc.getFiller());
+        }
+    }
 	/**
 	 * Checks if is relational slim.
 	 *

@@ -789,6 +789,11 @@ public class TermOutputerUtilities {
 		return word;
 	}
 
+	/**
+	 * if s is in any of the searchable ontology
+	 * @param s
+	 * @return
+	 */
 	private static boolean inOntology(String s) {
 		ArrayList<Hashtable<String, String>> matches = new ArrayList<Hashtable<String, String>> ();
 		TermOutputerUtilities.searchOntologies(s, "entity", matches);
