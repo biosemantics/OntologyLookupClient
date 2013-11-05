@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
+import edu.arizona.sirls.ontology_lookup.OntologyLookupClient;
 import edu.arizona.sirls.ontology_lookup.data.FormalConcept;
 import edu.arizona.sirls.ontology_lookup.data.Quality;
 import edu.arizona.sirls.ontology_lookup.data.SimpleEntity;
@@ -64,7 +65,11 @@ public class TermSearcher {
 	//for these terms, both strong and weak matches will be returned
 	//To add terms to this list: "short|term2";
 	public static String looseTerms = "short"; 
+	public OntologyLookupClient OLC;
 
+	public TermSearcher(OntologyLookupClient OLC){
+		this.OLC = OLC;
+	}
 	/**
 	 * Search term in the whole ontology (of a particular type) Result from each
 	 * ontology is either a match to original class, or via exact, narrow, or
@@ -319,7 +324,7 @@ public class TermSearcher {
 	 * @param query: ordinary string or regular expressions like (?:a b|c)
 	 * @return
 	 */
-	private static String formatExpand(String query) {
+	private String formatExpand(String query) {
 		// format
 		query = query.replaceAll("_", " "); // abc_1
 		query = query.replaceAll("(?<=\\w)- (?=\\w)", "-"); // dorsal- fin
@@ -342,15 +347,15 @@ public class TermSearcher {
 			if(token.length()>0){
 				token = token.replaceAll("\\\\b", "");
 				String tcopy = token;
-				token = Utilities.getSynRing4Phrase(token);
+				token = Utilities.getSynRing4Phrase(token, OLC);
 				query = query.replaceAll("\\b" + tcopy + "\\b", token);
 			}
 		}
 		return querycp+"|"+query;
 	}
 
-	public static String adjectiveOrganSearch(String term) {
-		Hashtable<String, String> result = SearchMain.ontoutil
+	public String adjectiveOrganSearch(String term) {
+		Hashtable<String, String> result = OLC.ontoutil
 				.searchAdjectiveOrgan(term, "entity");
 		if (result != null) {
 			// return the first match
@@ -379,7 +384,7 @@ public class TermSearcher {
 	private ArrayList<FormalConcept> getStrongMatch(String term, String query, String type,
 			ArrayList<Hashtable<String, String>> results, float confscore) {
 		ArrayList<FormalConcept> concepts = null;
-		SearchMain.ontoutil.searchOntologies(query, type, results);
+		OLC.ontoutil.searchOntologies(query, type, results);
 		if (results != null && results.size() > 0) {
 			// loop through results to find the closest match
 			// return original or exact match
@@ -612,7 +617,7 @@ public class TermSearcher {
 	 */
 	public static void main(String[] args) {
 
-		TermSearcher ts = new TermSearcher();
+		/*TermSearcher ts = new TermSearcher();
 		// FormalConcept result = ts.searchTerm("ornament", "quality");
 		// ArrayList<FormalConcept> result
 		// =TermSearcher.regexpSearchTerm("epichordal\\b.*", "entity");
@@ -629,7 +634,7 @@ public class TermSearcher {
 		if(quality!=null){
 			for (FormalConcept fc : quality)
 				System.out.println(fc.getLabel());
-		}
+		}*/
 	}
 
 }

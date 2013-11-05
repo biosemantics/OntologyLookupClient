@@ -9,6 +9,8 @@ import org.apache.log4j.Logger;
 //import org.jdom.Element;
 //import org.jdom.xpath.XPath;
 
+
+import edu.arizona.sirls.ontology_lookup.OntologyLookupClient;
 import edu.arizona.sirls.ontology_lookup.data.EntityProposals;
 
 /**
@@ -27,7 +29,12 @@ public abstract class EntitySearcher {
 			LOGGER.error("", e);
 		}
 	}
-	
+
+	public OntologyLookupClient OLC;
+
+	public EntitySearcher(OntologyLookupClient OLC){
+		this.OLC = OLC;
+	}
 	
 	/*whether the request can be handled by this searcher */
 	//public abstract boolean canHandle (Element root, String structid,  String entityphrase, String elocatorphrase, String originalentityphrase, String prep, int ingroup);

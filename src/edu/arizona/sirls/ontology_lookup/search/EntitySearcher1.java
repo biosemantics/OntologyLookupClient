@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
+import edu.arizona.sirls.ontology_lookup.OntologyLookupClient;
 import edu.arizona.sirls.ontology_lookup.data.CompositeEntity;
 import edu.arizona.sirls.ontology_lookup.data.Entity;
 import edu.arizona.sirls.ontology_lookup.data.EntityProposals;
@@ -44,8 +45,8 @@ public class EntitySearcher1 extends EntitySearcher {
 	/**
 	 * 
 	 */
-	public EntitySearcher1() {
-
+	public EntitySearcher1(OntologyLookupClient OLC){
+		super(OLC);
 	}
 	//TODO patterns s0fd16381: maxillae, anterior end of 
 	//entityphrase could be reg exp such as (?:A of B| B A) of (?: C D | D of C) or a simple string
@@ -86,7 +87,7 @@ public class EntitySearcher1 extends EntitySearcher {
 		for(String variation: variations){
 			LOGGER.debug("...search variation '"+variation+"'");
 			//ArrayList<FormalConcept> entityfcs = new TermSearcher().regexpSearchTerm(variation, "entity"); //remove indexes from variation before search
-			ArrayList<FormalConcept> entityfcs = new TermSearcher().searchTerm(variation, "entity"); //remove indexes from variation before search
+			ArrayList<FormalConcept> entityfcs = new TermSearcher(OLC).searchTerm(variation, "entity"); //remove indexes from variation before search
 			//check for the strength of the match: related synonyms: (?:(?:crista) (?:parotica)) entity=>tegmen tympani
 			if(entityfcs!=null){
 				for(FormalConcept entity:entityfcs){
@@ -145,7 +146,7 @@ public class EntitySearcher1 extends EntitySearcher {
 							String aelocatorphrase =  Utilities.join(parts, l+1, parts.length-1, " of ");
 							System.out.println("..EEL search: entity '"+aentityphrase+"' and locator '"+aelocatorphrase+"'");
 							LOGGER.debug("..EEL search: entity '"+aentityphrase+"' and locator '"+aelocatorphrase+"'");
-							EntityEntityLocatorStrategy eels = new EntityEntityLocatorStrategy(aentityphrase, aelocatorphrase, originalentityphrase, prep);
+							EntityEntityLocatorStrategy eels = new EntityEntityLocatorStrategy(aentityphrase, aelocatorphrase, originalentityphrase, prep, OLC);
 							eels.handle();
 							ArrayList<EntityProposals> entity = eels.getEntities(); //a list of different entities: both sexes => female and male
 							if(entity != null){
@@ -228,7 +229,7 @@ public class EntitySearcher1 extends EntitySearcher {
 					//elocatorphrase = elocatorphrase.replaceFirst("(\\(\\?:|\\)|\\|)", "");
 					LOGGER.debug("ES1->EEL...entity:'"+aentityphrase+"' entitylocator:'"+aelocatorphrase+"'");
 					if(elocatorphrase.length()>0){
-						EntityEntityLocatorStrategy eels = new EntityEntityLocatorStrategy(aentityphrase, aelocatorphrase, originalentityphrase, prep);
+						EntityEntityLocatorStrategy eels = new EntityEntityLocatorStrategy(aentityphrase, aelocatorphrase, originalentityphrase, prep, OLC);
 						eels.handle();
 						ArrayList<EntityProposals> entity = eels.getEntities(); //a list of different entities: both sexes => female and male
 						if(entity != null){
@@ -277,7 +278,7 @@ public class EntitySearcher1 extends EntitySearcher {
 			LOGGER.debug(System.getProperty("line.separator")+"EntitySearcher1 calls SpatialModifiedEntityStrategy");
 
 			//TODO: need more work: what's entityphrase and elocatorphrase?
-			SpatialModifiedEntityStrategy smes = new SpatialModifiedEntityStrategy(entityphrase, elocatorphrase, originalentityphrase, prep);
+			SpatialModifiedEntityStrategy smes = new SpatialModifiedEntityStrategy(entityphrase, elocatorphrase, originalentityphrase, prep, OLC);
 			smes.handle();
 			ArrayList<EntityProposals> entity = smes.getEntities();
 			if(entity != null){
@@ -319,7 +320,7 @@ public class EntitySearcher1 extends EntitySearcher {
 		//if(found) return entities;
 		
 		LOGGER.debug(System.getProperty("line.separator")+"EntitySearcher1 calls EntitySearcher4");
-		ArrayList<EntityProposals> entity = new EntitySearcher4().searchEntity(entityphrase, elocatorphrase, originalentityphrase, prep);
+		ArrayList<EntityProposals> entity = new EntitySearcher4(OLC).searchEntity(entityphrase, elocatorphrase, originalentityphrase, prep);
 		//proximal tarsal element:
 		//SpaticalModifiedEntity: phrase=proximal region entity=proximal region score=1.0 and (part_of some phrase=tarsal\b.* entity=tarsal bone score=0.5) 
 		//EntitySearcher5: phrase=proximal tarsal\b.* entity=proximal tarsal bone score=0.5
@@ -591,7 +592,7 @@ public class EntitySearcher1 extends EntitySearcher {
 			//String spatialphraseptn = "(?:"+Dictionary.singlewordspatialtermptn +")?\\s*"
 			//		+ "\\b(?:(?:"+Dictionary.allSpatialHeadNouns()+")\\b|\\b(?:"+TermOutputerUtilities.adjectiveorganptn+"))";
 			String singleptn = "((?:"+Dictionary.singlewordspatialtermptn +")\\b\\s*\\b(?:"+Dictionary.allSpatialHeadNouns()+")?\\b\\s*)|"
-					+ "\\b("+TermOutputerUtilities.adjectiveorganptn+")\\b\\s*";
+					+ "\\b("+OLC.ontoutil.adjectiveorganptn+")\\b\\s*";
 			String spatialphrasesptn = "((?:"+singleptn+")+)"; //allow selection of either single spatial term, spatial phrase, or organadjective, or combination of spatial and organadjs
 			String[] entityphrases = entityphrase.split("\\s*(,| of )\\s*");
 			//order of the phrases matters
@@ -633,7 +634,7 @@ public class EntitySearcher1 extends EntitySearcher {
 				temp =  temp.replaceAll("\\s+",  " ").replaceAll("(^#+|#+$)", "");
 				String[] temps =temp.split("\\s*#+\\s*");
 				if(temps.length==1){ //if the split didn't split, force split on spaces
-					ArrayList<FormalConcept> test = new TermSearcher().searchTerm(phrasecp, "entity"); 
+					ArrayList<FormalConcept> test = new TermSearcher(OLC).searchTerm(phrasecp, "entity"); 
 					if(test==null) temps = temp.split("\\s+"); 
 				}
 				ArrayList<EntityComponent> thiscomponents = new ArrayList<EntityComponent>();

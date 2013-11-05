@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
+import edu.arizona.sirls.ontology_lookup.OntologyLookupClient;
 import edu.arizona.sirls.ontology_lookup.data.CompositeEntity;
 import edu.arizona.sirls.ontology_lookup.data.Entity;
 import edu.arizona.sirls.ontology_lookup.data.EntityProposals;
@@ -44,18 +45,19 @@ public class SpatialModifiedEntityStrategy implements SearchStrategy {
 	private static Hashtable<String, ArrayList<EntityProposals>> cache = new Hashtable<String, ArrayList<EntityProposals>>();
 	private static ArrayList<String> nomatchcache = new ArrayList<String>();
 	public static Pattern spatialptn = Pattern.compile("^("+Dictionary.spatialtermptn+")\\b\\s*\\b("+Dictionary.allSpatialHeadNouns()+")?\\b");
-
+	public OntologyLookupClient OLC;
 	/**
 	 * [the expression is a query expanded with syn rings, 
 	 * for example, '(?:anterior|front) (?:maxilla|maxillary)'] --not yet
 	 */
 	public SpatialModifiedEntityStrategy(
 			String entityphrase, String elocatorphrase,
-			String originalentityphrase, String prep) {
+			String originalentityphrase, String prep, OntologyLookupClient OLC) {
 		this.entityphrase = entityphrase;
 		this.elocatorphrase = elocatorphrase;
 		this.prep = prep;
 		this.originalentityphrase = originalentityphrase;
+		this.OLC = OLC;
 		LOGGER.debug("SpatialModifiedEntityStrategy: search '"+entityphrase+"[orig="+originalentityphrase+"]'");
 	}
 
@@ -78,7 +80,7 @@ public class SpatialModifiedEntityStrategy implements SearchStrategy {
 		//entityl.setString(elocatorphrase);
 		if(elocatorphrase.length()>0) {
 			//ArrayList<FormalConcept> results = new TermSearcher().searchTerm(elocatorphrase, "entity"); //change this to EntitySearcherOriginal?
-			ArrayList<EntityProposals> results = new EntitySearcherOriginal().searchEntity(elocatorphrase, "",originalentityphrase, prep);
+			ArrayList<EntityProposals> results = new EntitySearcherOriginal(OLC).searchEntity(elocatorphrase, "",originalentityphrase, prep);
 			if(results!=null){
 				LOGGER.debug("SME...searched locator '"+elocatorphrase+"' found match: ");
 				for(EntityProposals result: results){
@@ -118,13 +120,13 @@ public class SpatialModifiedEntityStrategy implements SearchStrategy {
 			}else{
 				LOGGER.debug("SME...calls EntitySearcherOriginal for newentity '"+newentity/*+","+elocatorphrase*/+"'");
 				//sentityps = new EntitySearcherOriginal().searchEntity(root, structid,  newentity, elocatorphrase, originalentityphrase, prep); //advanced search
-				sentityps = new EntitySearcherOriginal().searchEntity(newentity, "", originalentityphrase, prep); //advanced search
+				sentityps = new EntitySearcherOriginal(OLC).searchEntity(newentity, "", originalentityphrase, prep); //advanced search
 			}
 
 			LOGGER.debug("SME...now search for spatial term  '"+spatialterm+"'");
 			//SimpleEntity sentity1 = (SimpleEntity)new TermSearcher().searchTerm(spatialterm, "entity");
 			//ArrayList<FormalConcept> spatialentities = TermSearcher.regexpSearchTerm(spatialterm, "entity");//anterior + region: simple search
-			ArrayList<FormalConcept> spatialentities = new TermSearcher().searchTerm(spatialterm, "entity");//anterior + region: simple search
+			ArrayList<FormalConcept> spatialentities = new TermSearcher(OLC).searchTerm(spatialterm, "entity");//anterior + region: simple search
 			if(spatialentities!=null) LOGGER.debug("...found match");
 			else{
 				//create phrase-based spatialentities

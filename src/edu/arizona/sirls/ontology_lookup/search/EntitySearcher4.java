@@ -8,6 +8,7 @@ import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 
+import edu.arizona.sirls.ontology_lookup.OntologyLookupClient;
 import edu.arizona.sirls.ontology_lookup.data.CompositeEntity;
 import edu.arizona.sirls.ontology_lookup.data.EntityProposals;
 import edu.arizona.sirls.ontology_lookup.data.FormalConcept;
@@ -29,9 +30,9 @@ public class EntitySearcher4 extends EntitySearcher {
 	/**
 	 * 
 	 */
-	public EntitySearcher4() {
+	public EntitySearcher4(OntologyLookupClient OLC){
+		super(OLC);
 	}
-
 
 
 	@Override
@@ -53,7 +54,7 @@ public class EntitySearcher4 extends EntitySearcher {
 
 		if(entitylocators!=null) {
 			//TODO: is elocator a reg exp?
-			ArrayList<FormalConcept> result = new TermSearcher().searchTerm(elocatorphrase, "entity"); //TODO: should it call EntitySearcherOriginal? decided not to.
+			ArrayList<FormalConcept> result = new TermSearcher(OLC).searchTerm(elocatorphrase, "entity"); //TODO: should it call EntitySearcherOriginal? decided not to.
 			if(result!=null){
 				LOGGER.debug("search for locator '"+elocatorphrase+"' found match: ");
 				for(FormalConcept fc: result){
@@ -71,7 +72,7 @@ public class EntitySearcher4 extends EntitySearcher {
 		String aentityphrase = entityphrase;
 		if(entityphrase.contains(" ")) aentityphrase = entityphrase.replaceAll("\\s+", " .*? ");
 		//ArrayList<FormalConcept> sentities = TermSearcher.regexpSearchTerm(entityphrase, "entity"); //candidate matches for the same entity
-		ArrayList<FormalConcept> sentities = new TermSearcher().searchTerm(aentityphrase, "entity"); //candidate matches for the same entity
+		ArrayList<FormalConcept> sentities = new TermSearcher(OLC).searchTerm(aentityphrase, "entity"); //candidate matches for the same entity
 
 		if(sentities!=null){
 			LOGGER.debug("search for entity '"+aentityphrase+"' found match, forming proposals...");
@@ -120,7 +121,7 @@ public class EntitySearcher4 extends EntitySearcher {
 			EntitySearcher4.nomatchcache.add(entityphrase+"+"+elocatorphrase);
 		}
 		LOGGER.debug("EntitySearcher4 calls EntitySearcher5");
-		return  new EntitySearcher5().searchEntity(entityphrase, elocatorphrase, originalentityphrase, prep);
+		return  new EntitySearcher5(OLC).searchEntity(entityphrase, elocatorphrase, originalentityphrase, prep);
 	}
 
 	/**

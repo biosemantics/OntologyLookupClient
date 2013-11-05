@@ -18,7 +18,6 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 import edu.arizona.sirls.ontology_lookup.owlaccessor.OWLAccessorImpl;
-import edu.arizona.sirls.ontology_lookup.search.SearchMain;
 import edu.arizona.sirls.ontology_lookup.utilities.Utilities;
 
 import org.atteo.evo.inflector.English;
@@ -29,28 +28,28 @@ import org.atteo.evo.inflector.English;
  */
 public class TermOutputerUtilities {
 	private static final Logger LOGGER = Logger.getLogger(TermOutputerUtilities.class);   
-	public static ArrayList<OWLAccessorImpl> OWLqualityOntoAPIs = new ArrayList<OWLAccessorImpl>();
-	public static ArrayList<OWLAccessorImpl> OWLentityOntoAPIs  = new ArrayList<OWLAccessorImpl>();
-	public static ArrayList<String> excluded = new ArrayList<String>();
-	private static String[] entityontologies;
-	private static String[] qualityontologies;
+	public  ArrayList<OWLAccessorImpl> OWLqualityOntoAPIs = new ArrayList<OWLAccessorImpl>();
+	public  ArrayList<OWLAccessorImpl> OWLentityOntoAPIs  = new ArrayList<OWLAccessorImpl>();
+	public  ArrayList<String> excluded = new ArrayList<String>();
+	private  String[] entityontologies;
+	private String[] qualityontologies;
 
 
 	public static boolean debug = false;
-	public static String attributes = "";
-	public static String adjectiveorganptn="";
-	public static OWLOntology uberon = null;
-	
-	
+	public  String attributes = "";
+	public  String adjectiveorganptn="";
+	public  OWLOntology uberon = null;
 
 
 
-	//note, the order of the ontolgies listed in the string imply the importance of the ontologies:
-	//(they will also be searched, but if a term match in multiple ontology, the first match is taken as the result)
-	static{
+	/**
+	 * constructor may be needed if we need to exclude different parts of ontology.
+	 * @param ontologyfolder
+	 */
+	public TermOutputerUtilities(String eonto, String bspo, String pato, Hashtable<String,String> ontoURLs){
 		//TODO:add GO:bioprocess
-		entityontologies = new String[]{SearchMain.eonto, SearchMain.bspo};
-		qualityontologies = new String[]{SearchMain.pato};
+		entityontologies = new String[]{eonto, bspo};
+		qualityontologies = new String[]{pato};
 		//get organ adjectives from Dictionary
 		Enumeration<String> organs = Dictionary.organadjectives.keys();
 		while(organs.hasMoreElements()){
@@ -63,31 +62,31 @@ public class TermOutputerUtilities {
 		for(String onto: entityontologies){
 			if(onto.endsWith(".owl")){
 				OWLAccessorImpl api;	
-				if(Utilities.ping(SearchMain.ontoURLs.get(onto), 200)){
-					api = new OWLAccessorImpl(SearchMain.ontoURLs.get(onto), new ArrayList<String>());
+				if(Utilities.ping(ontoURLs.get(onto), 200)){
+					api = new OWLAccessorImpl(ontoURLs.get(onto), new ArrayList<String>());
 				}else{
 					api = new OWLAccessorImpl(new File(onto), new ArrayList<String>());
 				}
 				OWLentityOntoAPIs.add(api);
 				//if(onto.endsWith(ApplicationUtilities.getProperty("ontology.uberon")+".owl")){
-					uberon = api.getOntology();
-					organs = api.organadjectives.keys();
-					while(organs.hasMoreElements()){
-						ArrayList<String> adjs = api.organadjectives.get(organs.nextElement());
-						for(String adj: adjs){
-							if(adj.length()>0)adjectiveorganptn += adj+"|"; 
-						}						
-					}	
+				uberon = api.getOntology();
+				organs = api.organadjectives.keys();
+				while(organs.hasMoreElements()){
+					ArrayList<String> adjs = api.organadjectives.get(organs.nextElement());
+					for(String adj: adjs){
+						if(adj.length()>0)adjectiveorganptn += adj+"|"; 
+					}						
+				}	
 				//}
 				//this.alladjectiveorgans.add(api.adjectiveorgans);
 			}/*else if(onto.endsWith(".obo")){ //no longer take OBO format
-				int i = onto.lastIndexOf("/");
-				int j = onto.lastIndexOf("\\");
-				i = i>j? i:j;
-				String ontoname = onto.substring(i+1).replaceFirst("\\.obo", "");
-				OBO2DB o2d = new OBO2DB(database, onto ,ontoname);
-				OBOentityOntoAPIs.add(o2d);
-			}*/
+						int i = onto.lastIndexOf("/");
+						int j = onto.lastIndexOf("\\");
+						i = i>j? i:j;
+						String ontoname = onto.substring(i+1).replaceFirst("\\.obo", "");
+						OBO2DB o2d = new OBO2DB(database, onto ,ontoname);
+						OBOentityOntoAPIs.add(o2d);
+					}*/
 		}
 		adjectiveorganptn = adjectiveorganptn.replaceAll("(^\\||\\|$)", "");
 
@@ -95,8 +94,8 @@ public class TermOutputerUtilities {
 		for(String onto: qualityontologies){
 			if(onto.endsWith(".owl")){
 				OWLAccessorImpl api;
-				if(Utilities.ping(SearchMain.ontoURLs.get(onto), 200)){
-					api = new OWLAccessorImpl(SearchMain.ontoURLs.get(onto), new ArrayList<String>());
+				if(Utilities.ping(ontoURLs.get(onto), 200)){
+					api = new OWLAccessorImpl(ontoURLs.get(onto), new ArrayList<String>());
 				}else{
 					api= new OWLAccessorImpl(new File(onto), excluded);
 				}
@@ -104,24 +103,15 @@ public class TermOutputerUtilities {
 				attributes = attributes.replaceAll("(^\\||\\|$)", "");
 				OWLqualityOntoAPIs.add(api);
 			}/*else if(onto.endsWith(".obo")){
-				int i = onto.lastIndexOf("/");
-				int j = onto.lastIndexOf("\\");
-				i = i>j? i:j;
-				String ontoname = onto.substring(i+1).replaceFirst("\\.obo", "");
-				OBO2DB o2d = new OBO2DB(database, onto ,ontoname);
-				OBOqualityOntoAPIs.add(o2d);
-			}*/
+						int i = onto.lastIndexOf("/");
+						int j = onto.lastIndexOf("\\");
+						i = i>j? i:j;
+						String ontoname = onto.substring(i+1).replaceFirst("\\.obo", "");
+						OBO2DB o2d = new OBO2DB(database, onto ,ontoname);
+						OBOqualityOntoAPIs.add(o2d);
+					}*/
 		}
 		//excluded.add(Dictionary.cellquality);//exclude "cellular quality"
-	}
-
-
-	/**
-	 * constructor may be needed if we need to exclude different parts of ontology.
-	 * @param ontologyfolder
-	 */
-	public TermOutputerUtilities(/*String ontologyfolder, String database*/){
-
 	}
 
 	/**
@@ -160,7 +150,7 @@ public class TermOutputerUtilities {
 	 * @param classid
 	 * @return parent id and label, or null if classid is null or classid does not exist in pato
 	 */
-	public static String[] retreiveParentInfoFromPATO (String classid){
+	public String[] retreiveParentInfoFromPATO (String classid){
 		if(classid==null) return null;
 
 		//translate classid to a PATO id
@@ -273,7 +263,7 @@ public class TermOutputerUtilities {
 	 * @param subgroup: inRelationalSlim
 	 * @return ArrayList of results, one result from an ontology 
 	 */
-	public static ArrayList<Hashtable<String, String>> searchOntologies(String term, String type, ArrayList<Hashtable<String, String>> results) {
+	public ArrayList<Hashtable<String, String>> searchOntologies(String term, String type, ArrayList<Hashtable<String, String>> results) {
 		//search quality or entity ontologies, depending on the type
 
 		//quality
@@ -316,7 +306,7 @@ public class TermOutputerUtilities {
 
 	}
 
-	
+
 	/**
 	 * 
 	 * @param term
@@ -365,14 +355,14 @@ public class TermOutputerUtilities {
 			}
 		}
 		//if(Boolean.valueOf(ApplicationUtilities.getProperty("search.exact"))){
-			oresult = merge(oresult, eresult);
+		oresult = merge(oresult, eresult);
+		if(oresult==null){
+			oresult = merge(oresult, nresult);
 			if(oresult==null){
-				oresult = merge(oresult, nresult);
-				if(oresult==null){
-					oresult = merge(oresult, rresult);
-				}
+				oresult = merge(oresult, rresult);
 			}
-			return oresult;
+		}
+		return oresult;
 		/*}else{
 			oresult = merge(oresult, eresult);
 			oresult = merge(oresult, nresult);
@@ -447,13 +437,13 @@ public class TermOutputerUtilities {
 		ArrayList<String> riris = new ArrayList<String>(Arrays.asList(result.get("iri").split(";")));
 		ArrayList<String> rplabels = new ArrayList<String>(Arrays.asList(result.get("parentlabel").split(";")));
 		ArrayList<String> rdefs = new ArrayList<String>(Arrays.asList(result.get("def").split(";")));
-		
+
 		ArrayList<String> tids = new ArrayList<String>(Arrays.asList(temp.get("id").split(";")));
 		ArrayList<String> tlabels = new ArrayList<String>(Arrays.asList(temp.get("label").split(";")));
 		ArrayList<String> tiris = new ArrayList<String>( Arrays.asList(temp.get("iri").split(";")));
 		ArrayList<String> tplabels = new ArrayList<String>(Arrays.asList(temp.get("parentlabel").split(";")));
 		ArrayList<String> tdefs = new ArrayList<String>(Arrays.asList(temp.get("def").split(";")));
-		
+
 		for(int i = 0; i<rids.size(); i++){
 			if(tids.contains(rids.get(i))){//deduplicate
 				tids.remove(rids.get(i));
@@ -639,7 +629,7 @@ public class TermOutputerUtilities {
 	 * return ""   : word is not a noun or is singular
 	 * return aword: word is a pl and singular form is returned
 	 */
-	public static String checkWN4Singular(String word){
+	public String checkWN4Singular(String word){
 
 		String result = checkWN("wn "+word+" -over");
 		if (result.length()==0){//word not in WN
@@ -666,7 +656,7 @@ public class TermOutputerUtilities {
 		return "";//original is a singular
 	}
 
-	public static boolean isPlural(String t) {
+	public boolean isPlural(String t) {
 		t = t.replaceAll("\\W", "");
 		if(t.matches("\\b(series|species|fruit)\\b")){
 			return true;
@@ -677,7 +667,7 @@ public class TermOutputerUtilities {
 		return false;
 	}
 
-	public static String toSingular(String word){
+	public String toSingular(String word){
 		String s = null;
 		word = word.toLowerCase().replaceAll("[(){}]", "").trim(); //bone/tendon
 
@@ -727,7 +717,7 @@ public class TermOutputerUtilities {
 			Pattern p10 = Pattern.compile("(.*?ma)ta$"); //stigmata => stigma (20 cases)
 			Pattern p11 = Pattern.compile("(.*?)des$"); //crepides => crepis (4 cases)
 			Pattern p12 = Pattern.compile("(.*?)es$"); // (14 cases)
-			
+
 			Matcher m1 = p1.matcher(word);
 			Matcher m2 = p2.matcher(word);
 			Matcher m3 = p3.matcher(word);
@@ -741,7 +731,7 @@ public class TermOutputerUtilities {
 			Matcher m10 = p10.matcher(word);
 			Matcher m11 = p10.matcher(word);
 			Matcher m12 = p10.matcher(word);
-			
+
 			if(m1.matches()){
 				s = m1.group(1)+"y";
 			}else if(m2.matches()){
@@ -772,7 +762,7 @@ public class TermOutputerUtilities {
 				s = m11.group(1)+"s";
 				if(!inOntology(s)) s = null;
 			}
-			
+
 			if(s==null & m12.matches()){
 				s = m12.group(1)+"is";
 				if(!inOntology(s)) s = null;
@@ -794,9 +784,9 @@ public class TermOutputerUtilities {
 	 * @param s
 	 * @return
 	 */
-	private static boolean inOntology(String s) {
+	private boolean inOntology(String s) {
 		ArrayList<Hashtable<String, String>> matches = new ArrayList<Hashtable<String, String>> ();
-		TermOutputerUtilities.searchOntologies(s, "entity", matches);
+		searchOntologies(s, "entity", matches);
 		if(matches.size()>0) return true; 
 		return false;
 	}
@@ -842,8 +832,8 @@ public class TermOutputerUtilities {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String[] results = retreiveParentInfoFromPATO("PATO:0000402");
-		System.out.println(results[1]);
+		//String[] results = retreiveParentInfoFromPATO("PATO:0000402");
+		//System.out.println(results[1]);
 	}
 
 

@@ -15,6 +15,8 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 
 
+
+import edu.arizona.sirls.ontology_lookup.OntologyLookupClient;
 import edu.arizona.sirls.ontology_lookup.data.Entity;
 import edu.arizona.sirls.ontology_lookup.data.EntityProposals;
 import edu.arizona.sirls.ontology_lookup.data.Quality;
@@ -394,15 +396,15 @@ public class Utilities {
 
 
 
-	public static String getSynRing4Phrase(String phrase){
+	public static String getSynRing4Phrase(String phrase, OntologyLookupClient OLC){
 		String synring = "";
 		if(phrase.length()==0) return synring;
 		phrase = phrase.replaceAll("(\\(\\?:|\\))", ""); //(?:(?:shoulder) (?:girdle)) =>shoulder girdle
 		String[] tokens = phrase.split("\\s+");
 		//may use a more sophisticated approach to construct ngrams: A B C => A B C;A (B C); (A B) C;
 		for(int i = 0; i < tokens.length; i++){
-			if(tokens[i].matches(Dictionary.spatialtermptn)) synring += "(?:"+SynRingVariation.getSynRing4Spatial(tokens[i])+")"+" ";
-			else synring += "(?:"+SynRingVariation.getSynRing4Structure(tokens[i])+")"+" ";
+			if(tokens[i].matches(Dictionary.spatialtermptn)) synring += "(?:"+SynRingVariation.getSynRing4Spatial(tokens[i], OLC)+")"+" ";
+			else synring += "(?:"+SynRingVariation.getSynRing4Structure(tokens[i], OLC)+")"+" ";
 		}
 		return synring.trim();
 	}

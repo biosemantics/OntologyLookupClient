@@ -12,6 +12,8 @@ import org.apache.log4j.Logger;
 
 import org.semanticweb.owlapi.model.OWLClass;
 
+
+import edu.arizona.sirls.ontology_lookup.OntologyLookupClient;
 //import ApplicationUtilities;
 //import Utilities;
 //import XML2EQ;
@@ -20,7 +22,6 @@ import edu.arizona.sirls.ontology_lookup.data.FormalRelation;
 import edu.arizona.sirls.ontology_lookup.data.Quality;
 import edu.arizona.sirls.ontology_lookup.data.SimpleEntity;
 import edu.arizona.sirls.ontology_lookup.owlaccessor.OWLAccessorImpl;
-import edu.arizona.sirls.ontology_lookup.search.SearchMain;
 import edu.mit.jwi.IDictionary;
 
 
@@ -189,7 +190,7 @@ public class Dictionary {
 	public static Hashtable<String, String> singulars = new Hashtable<String, String>();
 	public static Hashtable<String, String> plurals = new Hashtable<String, String>();
 	//private ArrayList<Hashtable<String, String>>  alladjectiveorgans = new ArrayList<Hashtable<String, String>> (); //one hashtable from an ontology
-	public static IDictionary wordnetdict = new edu.mit.jwi.Dictionary(new File(SearchMain.dictdir));
+	public static IDictionary wordnetdict = new edu.mit.jwi.Dictionary(new File(OntologyLookupClient.dictdir));
 	
 	//to hold complement of relations
 	public static Hashtable<String,String> complementRelations = new Hashtable<String,String>();

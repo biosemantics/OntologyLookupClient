@@ -39,7 +39,6 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.util.OWLClassExpressionVisitorAdapter;
 
 import edu.arizona.sirls.ontology_lookup.owlaccessor.OWLAccessorImpl;
-import edu.arizona.sirls.ontology_lookup.search.SearchMain;
 
 
 public class ELKReasoner{

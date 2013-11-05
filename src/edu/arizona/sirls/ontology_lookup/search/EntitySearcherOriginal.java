@@ -5,8 +5,10 @@ package edu.arizona.sirls.ontology_lookup.search;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+
 import org.apache.log4j.Logger;
 
+import edu.arizona.sirls.ontology_lookup.OntologyLookupClient;
 import edu.arizona.sirls.ontology_lookup.data.EntityProposals;
 import edu.arizona.sirls.ontology_lookup.knowledge.Dictionary;
 import edu.arizona.sirls.ontology_lookup.utilities.Utilities;
@@ -27,6 +29,10 @@ public class EntitySearcherOriginal extends EntitySearcher {
 	private static final Logger LOGGER = Logger.getLogger(EntitySearcherOriginal.class);  
 	private static Hashtable<String, ArrayList<EntityProposals>> cache = new Hashtable<String, ArrayList<EntityProposals>>();
 	private static ArrayList<String> nomatchcache = new ArrayList<String>();
+
+	public EntitySearcherOriginal(OntologyLookupClient OLC){
+		super(OLC);
+	}
 	/**
 	 * @param entityphrase: the entityphrase, which could be original entityphrase or regular expression such as (?:A of B| B A) of (?: C D | D of C) passed in by other EntitySearchers
 	 * @param elocatorphrase the elocatorphras
@@ -68,7 +74,7 @@ public class EntitySearcherOriginal extends EntitySearcher {
 				//aelocatorphrase = aelocatorphrase.replaceAll("body scale", "dermal scale");
 
 				LOGGER.debug("EntitySearcherOriginal calls EntitySearcher1");
-				ArrayList<EntityProposals> results =  new EntitySearcher1().searchEntity(aentityphrase, aelocatorphrase, originalentityphrase, prep);
+				ArrayList<EntityProposals> results =  new EntitySearcher1(OLC).searchEntity(aentityphrase, aelocatorphrase, originalentityphrase, prep);
 
 				if(results!=null && entities==null) entities = new ArrayList<EntityProposals>();
 				if(results!=null){	

@@ -8,6 +8,7 @@ import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 
+import edu.arizona.sirls.ontology_lookup.OntologyLookupClient;
 import edu.arizona.sirls.ontology_lookup.data.CompositeEntity;
 import edu.arizona.sirls.ontology_lookup.data.EntityProposals;
 import edu.arizona.sirls.ontology_lookup.data.FormalConcept;
@@ -30,7 +31,8 @@ public class EntitySearcher6 extends EntitySearcher {
 	/**
 	 * 
 	 */
-	public EntitySearcher6() {
+	public EntitySearcher6(OntologyLookupClient OLC){
+		super(OLC);
 	}
 
 	/* (non-Javadoc)
@@ -63,7 +65,7 @@ public class EntitySearcher6 extends EntitySearcher {
 		ArrayList<SimpleEntity> entityls = new ArrayList<SimpleEntity>();
 		//entityl.setString(elocatorphrase);
 		if(entitylocators!=null) {
-			ArrayList<FormalConcept> result = new TermSearcher().searchTerm(elocatorphrase, "entity"); //should it call EntitySearcherOriginal? decided not to.
+			ArrayList<FormalConcept> result = new TermSearcher(OLC).searchTerm(elocatorphrase, "entity"); //should it call EntitySearcherOriginal? decided not to.
 			if(result!=null){
 				//entityl = result;
 				LOGGER.debug("search for locator '"+elocatorphrase+"' found match: ");
@@ -84,7 +86,7 @@ public class EntitySearcher6 extends EntitySearcher {
 			if(!shortened.matches(".*?\\b("+Dictionary.spatialtermptn+")$")){
 				//SimpleEntity sentity = (SimpleEntity) new TermSearcher().searchTerm(shortened, "entity");
 				//search shortened and other strings with the same starting words
-				ArrayList<FormalConcept> shortentities = new TermSearcher().searchTerm(shortened, "entity");
+				ArrayList<FormalConcept> shortentities = new TermSearcher(OLC).searchTerm(shortened, "entity");
 				if(shortentities!=null){
 					LOGGER.debug("search for entity '"+shortened+"' found match, forming proposals...");
 					//construct anatomicalentity
@@ -97,10 +99,10 @@ public class EntitySearcher6 extends EntitySearcher {
 					EntityProposals ep = new EntityProposals(); 
 					ep.setPhrase(originalentityphrase);
 					boolean found = false;
-					for(FormalConcept sentityfc: shortentities){
+					/*for(FormalConcept sentityfc: shortentities){
 						//if sentity part_of entityl holds, then sentity's conf score = 1 and return the result
 						SimpleEntity sentity = (SimpleEntity)sentityfc;
-						if(sentity.isOntologized() && entityls!=null /*&& entityls.isOntologized()*/){
+						if(sentity.isOntologized() && entityls!=null){
 							for(FormalConcept fc: entityls){
 								SimpleEntity entityl = (SimpleEntity)fc;
 								if(SearchMain.elk!=null && SearchMain.elk.isSubclassOfWithPart(entityl.getClassIRI(), sentity.getClassIRI())){
@@ -114,16 +116,10 @@ public class EntitySearcher6 extends EntitySearcher {
 									//ep.setPhrase(sentity.getString());
 									ep.add(centity);//add one proposal with anatomical entity
 									LOGGER.debug("add a proposal with anatomical entity:"+centity.toString());
-									/*centity = new CompositeEntity();
-									centity.addEntity(sentity);
-									centity.addParentEntity(new REntity(rel, entityl)); //part of entityl
-									centity.setString(originalentityphrase);
-									ep.add(centity); //add the other proposal without anatomical entity	
-									LOGGER.debug("add the other proposal without anatomical entity:"+centity.toString());*/		
 								}
 							}
 						}
-					}
+					}*/
 					if(found){
 						ArrayList<EntityProposals> entities = new ArrayList<EntityProposals>();
 						//entities.add(ep);
@@ -218,7 +214,7 @@ public class EntitySearcher6 extends EntitySearcher {
 				//if failed, try wildcard 
 				
 				//ArrayList<FormalConcept> sentities = TermSearcher.regexpSearchTerm(shortened+"\\b.*", "entity"); //candidate matches for the same entity
-				ArrayList<FormalConcept> sentities = new TermSearcher().searchTerm(shortened+"\\b.*", "entity"); //candidate matches for the same entity
+				ArrayList<FormalConcept> sentities = new TermSearcher(OLC).searchTerm(shortened+"\\b.*", "entity"); //candidate matches for the same entity
 				if(sentities!=null){
 					LOGGER.debug("search for entity '"+shortened+"\\b.*' found match, forming proposals...");
 					//construct anatomicalentity
@@ -236,23 +232,16 @@ public class EntitySearcher6 extends EntitySearcher {
 					EntityProposals ep = new EntityProposals(); 
 					ep.setPhrase(originalentityphrase);
 					boolean found = false;
-					for(FormalConcept sentityfc: sentities){
+					/*for(FormalConcept sentityfc: sentities){
 						//if sentity part_of entityl holds, then sentity's conf score = 1 and return the result
 						SimpleEntity sentity = (SimpleEntity)sentityfc;
-						if(sentity.isOntologized() && entityls!=null /*&& entityls.isOntologized()*/){
+						if(sentity.isOntologized() && entityls!=null){
 							for(FormalConcept fc: entityls){
 								SimpleEntity entityl = (SimpleEntity)fc;
 								if(SearchMain.elk!=null && SearchMain.elk.isSubclassOfWithPart(entityl.getClassIRI(), sentity.getClassIRI())){
 									LOGGER.debug("'"+entityl.getLabel() +"' and '"+sentity.getLabel() + "' are related, increase confidence score");
 									found = true;
 									sentity.setConfidenceScore(1f);
-									/*CompositeEntity centity = new CompositeEntity();
-									centity.addEntity(anatomicalentity);//anatomical entity ...								
-									centity.addParentEntity(new REntity(rel, sentity)); // part of sentity ...
-									centity.addParentEntity(new REntity(rel, entityl)); //part of entityl
-									//ep.setPhrase(sentity.getString());
-									ep.add(centity);//add one proposal with anatomical entity
-									LOGGER.debug("add a proposal with anatomical entity:"+centity.toString());*/
 									CompositeEntity centity = new CompositeEntity();
 									centity.addEntity(sentity);
 									centity.addParentEntity(new REntity(rel, entityl)); //part of entityl
@@ -262,7 +251,7 @@ public class EntitySearcher6 extends EntitySearcher {
 								}
 							}
 						}
-					}
+					}*/
 					if(found){
 						ArrayList<EntityProposals> entities = new ArrayList<EntityProposals>();
 						//entities.add(ep);

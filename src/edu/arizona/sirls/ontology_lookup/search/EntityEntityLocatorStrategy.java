@@ -10,6 +10,8 @@ import org.apache.log4j.Logger;
 //import org.jdom.Element;
 
 
+
+import edu.arizona.sirls.ontology_lookup.OntologyLookupClient;
 import edu.arizona.sirls.ontology_lookup.data.CompositeEntity;
 import edu.arizona.sirls.ontology_lookup.data.Entity;
 import edu.arizona.sirls.ontology_lookup.data.EntityProposals;
@@ -37,15 +39,17 @@ public class EntityEntityLocatorStrategy implements SearchStrategy {
 	
 	private static Hashtable<String, ArrayList<EntityProposals>> cache = new Hashtable<String, ArrayList<EntityProposals>>();
 	private static ArrayList<String> nomatchcache = new ArrayList<String>();
+	public OntologyLookupClient OLC;
 	/**
 	 * 
 	 */
 	public EntityEntityLocatorStrategy(String entityphrase, String elocatorphrase,
-			String originalentityphrase, String prep) {
+			String originalentityphrase, String prep, OntologyLookupClient OLC) {
 		this.elocatorphrase = elocatorphrase;
 		this.entityphrase = entityphrase;
 		this.prep = prep;
 		this.originalentityphrase = originalentityphrase;
+		this.OLC = OLC;
 		LOGGER.debug("EntityEntityLocatorStrategy: search '"+entityphrase+"[orig="+originalentityphrase+"]'");
 
 	}
@@ -76,7 +80,7 @@ public class EntityEntityLocatorStrategy implements SearchStrategy {
 		//entitylp.setPhrase(elocatorphrase);
 		if(entitylocators!=null) {
 			//SimpleEntity result = (SimpleEntity) new TermSearcher().searchTerm(elocatorphrase, "entity");
-			ArrayList<EntityProposals> result = new EntitySearcherOriginal().searchEntity(elocatorphrase, "", originalentityphrase, prep); //advanced search
+			ArrayList<EntityProposals> result = new EntitySearcherOriginal(OLC).searchEntity(elocatorphrase, "", originalentityphrase, prep); //advanced search
 			if(result!=null){
 				entitylps = result;
 				LOGGER.debug("EEL...searched locator '"+elocatorphrase+"[orig="+originalentityphrase+"]':");
@@ -90,7 +94,7 @@ public class EntityEntityLocatorStrategy implements SearchStrategy {
 		}
 		//SimpleEntity sentity = (SimpleEntity)new TermSearcher().searchTerm(entityphrase, "entity");
 		
-		sentityps = new EntitySearcherOriginal().searchEntity(entityphrase, "", originalentityphrase, prep); //advanced search
+		sentityps = new EntitySearcherOriginal(OLC).searchEntity(entityphrase, "", originalentityphrase, prep); //advanced search
 		if(sentityps!=null && entitylps!=null){//if entity matches
 			//entity
 			for(EntityProposals entitylp: entitylps){
@@ -123,9 +127,9 @@ public class EntityEntityLocatorStrategy implements SearchStrategy {
 								//check elk: can sentity be part of entityl? 'intermedium (fore)' is part of 'manus'
 								//if true for any proposal, return it
 								//otherwise, return all
-								if(SearchMain.elk!=null && SearchMain.elk.isPartOf(sentity.getClassIRI(),entityl.getClassIRI())){
-									confirmed = true;
-								}
+								//if(SearchMain.elk!=null && SearchMain.elk.isPartOf(sentity.getClassIRI(),entityl.getClassIRI())){
+								//	confirmed = true;
+								//}
 								//composite entity
 								CompositeEntity centity = new CompositeEntity();
 								centity.addEntity(sentity);

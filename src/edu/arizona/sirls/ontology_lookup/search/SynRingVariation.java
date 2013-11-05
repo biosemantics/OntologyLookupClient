@@ -6,8 +6,10 @@ package edu.arizona.sirls.ontology_lookup.search;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+
 import org.apache.log4j.Logger;
 
+import edu.arizona.sirls.ontology_lookup.OntologyLookupClient;
 import edu.arizona.sirls.ontology_lookup.knowledge.Dictionary;
 import edu.arizona.sirls.ontology_lookup.knowledge.TermOutputerUtilities;
 import edu.arizona.sirls.ontology_lookup.owlaccessor.OWLAccessorImpl;
@@ -53,7 +55,7 @@ public class SynRingVariation {
 	 * @return
 	 */
 	//TODO check duplicates: (?:(?:opening|foramina|foramen|foramens|perforation|orifice|opening|foramina|bone foramen|foramen|foramens|bone foramen|perforation|orifice|orifice))
-	public static String getSynRing4Structure(String structure) {
+	public static String getSynRing4Structure(String structure, OntologyLookupClient OLC) {
 		if(structure.length()==0) return "";
 		String synring = cache.get(structure);
 		if(synring!=null) return synring;
@@ -74,8 +76,8 @@ public class SynRingVariation {
 		}
 		
 		//find owlapi for UBERON
-		for(OWLAccessorImpl temp:TermOutputerUtilities.OWLentityOntoAPIs){
-			if(temp.getSource().indexOf(SearchMain.entityonto)>1){
+		for(OWLAccessorImpl temp:OLC.ontoutil.OWLentityOntoAPIs){
+			if(temp.getSource().indexOf(OLC.entityonto)>1){
 				owlapi=temp;
 				break;
 			}
@@ -110,14 +112,14 @@ public class SynRingVariation {
 	 * @param spatial: one word spatial term such as 'anterior'
 	 * @return: a string of synonym ring like "anterior|syn1|syn2"
 	 */
-	public static String getSynRing4Spatial(String spatial) {
+	public static String getSynRing4Spatial(String spatial, OntologyLookupClient OLC) {
 		if(spatial.length()==0) return "";
 		String synring = cache.get(spatial);
 		if(synring!=null) return synring;
 		//String forms = prefixSpatial(spatial);
 		OWLAccessorImpl owlapi=null;
 
-		for(OWLAccessorImpl temp:TermOutputerUtilities.OWLentityOntoAPIs){
+		for(OWLAccessorImpl temp:OLC.ontoutil.OWLentityOntoAPIs){
 			if(temp.getSource().indexOf("bspo")>=1){
 				owlapi=temp;
 				break;
@@ -152,8 +154,8 @@ public class SynRingVariation {
 		System.out.println("sv.leadspatialtermvariation = "+sv.leadspatialtermvariation);
 		System.out.println("sv.headnounvariation ="+sv.headnounvariation);
 	*/
-	System.out.println(SynRingVariation.getSynRing4Spatial("basal"));
-	System.out.println(SynRingVariation.getSynRing4Structure("radial"));
+	//System.out.println(SynRingVariation.getSynRing4Spatial("basal"));
+//	System.out.println(SynRingVariation.getSynRing4Structure("radial"));
 		
 	}
 

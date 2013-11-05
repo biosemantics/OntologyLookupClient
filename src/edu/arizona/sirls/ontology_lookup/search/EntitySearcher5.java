@@ -3,9 +3,12 @@ package edu.arizona.sirls.ontology_lookup.search;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+
 import org.apache.log4j.Logger;
 
 
+
+import edu.arizona.sirls.ontology_lookup.OntologyLookupClient;
 import edu.arizona.sirls.ontology_lookup.data.EntityProposals;
 import edu.arizona.sirls.ontology_lookup.data.FormalConcept;
 import edu.arizona.sirls.ontology_lookup.data.SimpleEntity;
@@ -23,8 +26,8 @@ public class EntitySearcher5 extends EntitySearcher {
 	private static Hashtable<String, ArrayList<EntityProposals>> cache = new Hashtable<String, ArrayList<EntityProposals>>();
 	private static ArrayList<String> nomatchcache = new ArrayList<String>();
 	
-	public EntitySearcher5() {
-
+	public EntitySearcher5(OntologyLookupClient OLC){
+		super(OLC);
 	}
 
 	@Override
@@ -51,7 +54,7 @@ public class EntitySearcher5 extends EntitySearcher {
 		if(aentityphrase.indexOf(" ")<0){
 			Hashtable<String, String> headnouns = new Hashtable<String, String>();
 			//ArrayList<FormalConcept> regexpresults = TermSearcher.regexpSearchTerm(entityphrase+" .*", "entity");
-			ArrayList<FormalConcept> regexpresults = new TermSearcher().searchTerm(aentityphrase+" .*", "entity");
+			ArrayList<FormalConcept> regexpresults = new TermSearcher(OLC).searchTerm(aentityphrase+" .*", "entity");
 			String nouns = null;
 			if(regexpresults!=null){
 				LOGGER.debug("...search entity '"+aentityphrase+" .*' found match");
@@ -135,7 +138,7 @@ public class EntitySearcher5 extends EntitySearcher {
 		EntitySearcher5.nomatchcache.add(entityphrase+"+"+elocatorphrase);
 		LOGGER.debug("...search for entity '"+entityphrase+"' found no match");
 		LOGGER.debug("EntitySearcher5 calls EntitySearcher6");
-		return new EntitySearcher6().searchEntity(entityphrase, elocatorphrase, originalentityphrase, prep);
+		return new EntitySearcher6(OLC).searchEntity(entityphrase, elocatorphrase, originalentityphrase, prep);
 			
 	}
 
